@@ -1,0 +1,18 @@
+namespace: bigouden
+name: utils
+version: 1.0.0
+readme: README.md
+authors:
+  - Thomas GUIRRIEC <thomas@guirriec.fr>
+description: Ansible Utilities
+license:
+  - MIT
+tags:
+  - utilities
+  - cache
+dependencies: {}
+repository: https://github.com/bigouden/utils
+documentation: https://github.com/bigouden/utils
+homepage: https://github.com/bigouden/utils
+issues: https://github.com/bigouden/utils/issues
+build_ignore: []
