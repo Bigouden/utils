@@ -84,7 +84,7 @@ class LookupModule(LookupBase):
         """Run"""
 
         lookup_name, terms = terms[0], terms[1:]
-        key = terms[0]
+        key = f'{terms[0]}{kwargs}'
 
         try:
             result = CACHE[key]
