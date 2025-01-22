@@ -28,6 +28,7 @@ the lookup, which adds up very quickly.
 
 from __future__ import absolute_import, division, print_function
 
+import hashlib
 import json
 import os.path
 
@@ -77,6 +78,14 @@ except (IOError, ValueError):
     CACHE = {}
 
 
+def gen_hash(key):
+    """Generate Hash"""
+    sha256_hash = hashlib.sha256()
+    string_key = str(key).encode("utf-8")
+    sha256_hash.update(string_key)
+    return sha256_hash.hexdigest()
+
+
 class LookupModule(LookupBase):
     """Lookup Module Class"""
 
@@ -84,7 +93,8 @@ class LookupModule(LookupBase):
         """Run"""
 
         lookup_name, terms = terms[0], terms[1:]
-        key = f"{terms[0]}{kwargs}"
+        sorted_kwargs = {key: kwargs[key] for key in sorted(kwargs)}
+        key = gen_hash(f"{terms[0]}{sorted_kwargs}")
 
         try:
             result = CACHE[key]
