@@ -11,10 +11,14 @@
 # pylint: disable=attribute-defined-outside-init
 # mypy: disable-error-code="attr-defined"
 
+
 """
+An Ansible lookup plugin that retrieves resources and secrets from the Passbolt API.
+
 Source: https://github.com/passbolt/lab-passbolt-ansible-collection
 
-An Ansible lookup plugin that retrieve resources and secrets from passbolt API.
+This plugin allows Ansible to securely fetch credentials and other secrets
+from Passbolt, reducing the need to store sensitive information in playbooks.
 """
 
 from __future__ import absolute_import, division, print_function
@@ -30,40 +34,42 @@ from passbolt import PassboltAPI
 
 __version__ = "1.0.0"
 
-
 DOCUMENTATION = """
 lookup: passbolt
-short_description: Cache the result of a lookup
+short_description: Retrieve secrets from Passbolt API.
 description:
-  - This lookup returns resources and secrets from passbolt API.
+  This lookup fetches resources and secrets from the Passbolt API.
 options:
   per_uuid:
-    description: The searched term is a passbolt resource UUID
+    description: Search for a Passbolt resource by UUID.
     type: bool
-    required: False
-    default: False
+    required: false
+    default: false
   username:
-    description: filter the searched term per username
+    description: Filter results by username.
     type: str
-    require: False
+    required: false
     default: ""
   uri:
-    description: filter the searched term per uri
+    description: Filter results by URI.
     type: str
-    require: False
+    required: false
     default: ""
   description:
-    description: filter the searched term per description
+    description: Filter results by description.
     type: str
-    require: False
+    required: false
     default: ""
+requirements:
+  - passbolt-py
 """
 
 EXAMPLES = """
-- name: "Passbolt lookup plugin / fetch one"
+- name: Retrieve a single resource from Passbolt
   debug:
-    var: lookup('passbolt', 'OVH')
-- name: "Passbolt lookup plugin / loop with filters"
+    var: lookup('bigouden.utils.passbolt', 'OVH')
+
+- name: Retrieve multiple resources with filters
   debug:
     var: item
   loop:
@@ -71,14 +77,15 @@ EXAMPLES = """
     - "{{ lookup('bigouden.utils.passbolt', 'a294b8d6-5dae-6-9e49', per_uuid='true') }}"
     - "{{ lookup('bigouden.utils.passbolt', 'OVH', username='zero@ellingson.corp') }}"
 
-- name: "Passbolt lookup plugin / fetch list of items"
+- name: Retrieve a list of resources
   debug:
     var: item
   with_passbolt:
     - "n8n"
     - "Scaleway"
-    - "This doesn't exists"
-- name: Generate AWS credentials profile
+    - "This doesn't exist"
+
+- name: Generate AWS credentials from Passbolt
   ansible.builtin.copy:
     vars:
       aws:
@@ -95,8 +102,7 @@ EXAMPLES = """
 
 RETURN = """
   _raw:
-    description:
-      - content of file(s)
+    description: Retrieved content from Passbolt.
     type: list
     elements: str
 """
@@ -236,7 +242,7 @@ class LookupModule(LookupBase):
                 "PASSBOLT_VERIFY", variables, variables.get("environment"), default=True
             ),
             "timeout": self._get_value(
-                "PASSBOLT_TIMEOUT", variables, variables.get("environment")
+                "PASSBOLT_TIMEOUT", variables, variables.get("environment"), default=5.0
             ),
             "create_new_resource": self._get_value(
                 "PASSBOLT_CREATE_NEW_RESOURCE",
@@ -345,5 +351,4 @@ class LookupModule(LookupBase):
                     ret.append(self._create_new_resource(kwargs))
                 else:
                     raise Exception(f"resource {terms[0]} not found")
-
         return ret

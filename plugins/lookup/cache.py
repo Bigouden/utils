@@ -8,22 +8,15 @@
 # pylint: disable=too-few-public-methods
 
 """
-Source: https://github.com/GoodRx/ansible-cached-lookup/pull/5
-
 An Ansible lookup plugin that caches the results of any other lookup.
 
-By default, Ansible evaluates any lookups in a group/host var whenever the var
-is accessed. For example, given a group/host var:
+Source: https://github.com/GoodRx/ansible-cached-lookup/pull/5
 
-.. code-block:: yaml
+By default, Ansible evaluates lookups in a group/host variable
+whenever the variable is accessed, which can lead to performance issues.
 
-    content: "{{ lookup('pipe', 'command') }}"
-
-Any tasks that access ``content`` (e.g. in a template) will re-evaluate
-the lookup, which adds up very quickly.
-
-.. seealso:: :attr:`.DOCUMENTATION`, :attr:`.EXAMPLES`, `ansible/ansible#9623
-    <https://github.com/ansible/ansible/issues/9623>`_
+This plugin caches lookup results for the duration of the play,
+reducing redundant executions.
 """
 
 from __future__ import absolute_import, division, print_function
@@ -38,7 +31,6 @@ from ansible.plugins.loader import lookup_loader
 from ansible.plugins.lookup import LookupBase
 
 __version__ = "1.0.0"
-
 
 DOCUMENTATION = """
 lookup: cache
